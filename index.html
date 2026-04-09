@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Todo Web App</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="row">
+      <div class="brand">
+        <div class="logo" aria-hidden></div>
+        <div>
+          <h1>Todo Web APP</h1>
+          <div class="subtitle">Clean and Calm</div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button id="exportBtn" class="btn">Export</button>
+        <label class="btn btnLast" style="cursor:pointer">Import
+          <input id="importInput" type="file" accept="application/json" style="display:none">
+        </label>
+        <button id="themeBtn" class="btn ghost">Toggle Theme</button>
+      </div>
+    </header>
+
+    <div class="layout">
+      <!-- SIDEBAR -->
+      <aside id="sidebar" class="card sidebar-collapsed">
+        <div class="filters">
+          <div class="row" style="justify-content:space-between;align-items:center">
+            <div style="font-weight:700">Filters</div>
+            <button id="clearCompleted" class="btn">Clear Completed</button>
+          </div>
+
+          <div class="row" style="gap:10px;align-items:center">
+            <label class="row"><input id="showCompleted" type="checkbox" checked> Show completed</label>
+            <button id="resetFilters" class="btn">Reset</button>
+          </div>
+
+          <div class="row" style="gap:8px">
+            <div class="field"><div class="mutedSmall">Priority</div>
+              <select id="priorityFilter"><option value="all">All</option><option>low</option><option>medium</option><option>high</option><option>urgent</option></select>
+            </div>
+            <div class="field"><div class="mutedSmall">Status</div>
+              <select id="statusFilter"><option value="all">All</option><option value="backlog">backlog</option><option value="in-progress">in-progress</option><option value="done">done</option></select>
+            </div>
+          </div>
+
+          <div class="field"><div class="mutedSmall">Project</div>
+            <select id="projectFilter"><option value="all">All</option></select>
+          </div>
+
+          <div style="margin-top:8px" class="mutedSmall">Tags</div>
+          <div id="tagsCloud" class="tagsCloud"><div class="mutedSmall">No tags yet</div></div>
+
+          <div style="margin-top:12px;font-weight:700">Stats</div>
+          <div class="statsGrid">
+            <div class="stat"><div class="n" id="statTotal">0</div><div class="mutedSmall">Total</div></div>
+            <div class="stat"><div class="n" id="statCompleted">0</div><div class="mutedSmall">Completed</div></div>
+            <div class="stat"><div class="n" id="statOverdue">0</div><div class="mutedSmall">Overdue</div></div>
+            <div class="stat"><div class="n" id="statToday">0</div><div class="mutedSmall">Due Today</div></div>
+          </div>
+
+          <div id="bulkBox" style="margin-top:12px;display:none">
+            <div style="font-weight:700;margin-bottom:8px">Bulk actions</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button id="bulkSelectVisible" class="btn">Select visible</button>
+              <button id="bulkComplete" class="btn">Complete</button>
+              <button id="bulkDelete" class="btn">Delete</button>
+              <button id="bulkPin" class="btn">Pin</button>
+              <button id="bulkUnpin" class="btn">Unpin</button>
+            </div>
+          </div>
+
+        </div>
+      </aside>
+
+      <!-- MAIN -->
+      <main>
+        <div class="card">
+          <div class="toolbar" style="align-items:center">
+            <div class="search">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden><path d="M21 21l-4.35-4.35" stroke="#9AA4B2" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="11" cy="11" r="6" stroke="#9AA4B2" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <input id="search" placeholder="Search tasks, #tags, projects, notes" aria-label="Search tasks">
+              <button id="clearSearch" class="btn">Clear</button>
+            </div>
+            <div style="margin-left:12px" class="info-pill">Tip: Drag to reorder when <strong style="margin:0 6px">Sort: Custom</strong> and <strong>Group: None</strong></div>
+          </div>
+          <div style="margin-top:12px" class="small muted">Organize tasks by project, priority and due date. Color-coded projects help quick scanning.</div>
+        </div>
+
+        <!-- Quick Add -->
+        <form id="quickForm" class="card quick" aria-label="Add task form">
+          <input id="qTitle" class="field" placeholder="Add a task…" aria-label="Task title">
+          <input id="qProject" class="field" placeholder="Project" value="Personal" aria-label="Project">
+          <select id="qPriority" class="field" aria-label="Priority"><option>low</option><option selected>medium</option><option>high</option><option>urgent</option></select>
+          <input id="qDue" class="field" type="date" aria-label="Due date">
+          <button class="btn primary" type="submit">Add</button>
+        </form>
+
+        <!-- Groups / Lists -->
+        <div id="groups" class="groups"></div>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Templates -->
+  <template id="taskTpl">
+    <div class="task" draggable="true">
+      <div class="row" style="align-items:flex-start;gap:12px">
+        <input class="sel" type="checkbox" title="Select" />
+        <div style="flex:1">
+          <div style="display:flex;align-items:center;gap:8px">
+            <input class="title" placeholder="Task title" />
+            <div style="margin-left:auto;display:flex;gap:8px">
+              <button class="pin btn" title="Pin">📌</button>
+              <button class="del btn" title="Delete">🗑️</button>
+            </div>
+          </div>
+          <textarea class="notes" rows="2" placeholder="Notes" style="width:100%;margin-top:8px;border-radius:10px;border:1px solid var(--border);padding:8px"></textarea>
+          <div class="pills">
+            <div class="pill project"></div>
+            <div class="pill due"></div>
+            <div class="pill status"></div>
+            <div class="pill priority"></div>
+          </div>
+          <div class="meta"></div>
+        </div>
+      </div>
+    </div>
+  </template>
+<script src="script.js"></script>
+</body>
+</html>
